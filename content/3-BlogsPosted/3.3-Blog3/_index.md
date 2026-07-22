@@ -5,27 +5,70 @@ weight: 1
 chapter: false
 pre: " <b> 3.3. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
+# AWS COST OPTIMIZATION – Migrating Amazon EBS Volumes from gp2 to gp3
+-----
 
-# SESSION POLICIES IN AMAZON EKS POD IDENTITY
+### ARCHITECTURE AND PERFORMANCE COMPARISON: gp2 VS gp3
+The core difference between the two disk generations lies in their performance provisioning mechanism:
 
-Amazon EKS Pod Identity has recently added the session policies feature, allowing you to narrow IAM permissions flexibly and precisely for each pod without needing to create many separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+gp2 (Performance Tied to Capacity): Disk performance is strictly locked to storage capacity (3 IOPS/GB). If an application requires more IOPS, you are forced to increase the volume capacity (e.g., to get 3,000 IOPS, the disk must be at least 1,000 GB), which wastes money on unused space.
 
-Key points to know:
+gp3 (Capacity and Performance Decoupled): Designed with complete independence between Capacity, IOPS, and Throughput. A default gp3 volume provides 3,000 IOPS and 125 MB/s Throughput completely free, independent of disk size. When higher performance is needed, you can purchase additional IOPS or Throughput separately without expanding capacity.
 
-* A session policy is an inline IAM policy specified when creating or updating a Pod Identity association.
-* Effective permissions = intersection between the IAM role permissions and the session policy → the session policy can only narrow permissions, not expand them.
-* Helps avoid over-permissioning when reusing a single IAM role for multiple workloads with different needs.
-* Supports both same-account and cross-account (via IAM role chaining).
-* Significantly reduces the number of IAM roles that need to be managed, helping avoid hitting IAM quota limits in large clusters.
-* Easily configured through the AWS Management Console, AWS CLI, or AWS SDK when creating an association between a Kubernetes ServiceAccount and an IAM role.
+---
+### Quick Comparison:
 
-This feature is especially useful when you have many applications running on the same IAM role but need different permission restrictions (for example: one pod only reads a specific S3 bucket, another pod only calls certain APIs).
+Storage Unit Price: gp3 is up to 20% cheaper than gp2 across all regions.
 
-...Image...
+Default Baseline: gp2 delivers 3 IOPS/GB (up to 16,000 IOPS), while gp3 provides a fixed 3,000 IOPS (up to 16,000 IOPS).
 
-...Link...
+Default Throughput: gp2 ranges from 128 MB/s to 250 MB/s (depending on capacity), whereas gp3 is fixed at 125 MB/s (can be actively increased up to 1,000 MB/s).
 
-...Guide...
+Scaling Mechanism: gp2 forces you to buy more GBs to scale performance, while gp3 lets you independently customize GBs, IOPS, and Throughput.
+
+---
+### CORE BENEFITS AND PRIORITY WORKLOADS
+Immediate FinOps Budget Optimization: The GB/month unit price of gp3 is roughly 20% lower than gp2. For systems operating hundreds or thousands of volumes, migration delivers massive monthly operational cost savings.
+
+Zero-Downtime Migration: Thanks to Amazon EBS Elastic Volumes, moving from gp2 to gp3 happens directly on active volumes. EC2 instances continue running normally without requiring reboots, data restoration, or application disruptions.
+
+Priority Workloads for Migration:
+
+Web Applications & API Servers
+
+Small and Medium Databases (MySQL, PostgreSQL, MongoDB, SQL Server)
+
+Bastion Hosts, Monitoring Servers (Prometheus, Zabbix)
+
+CI/CD Workers (Jenkins, GitLab Runner)
+
+File Servers & Storage Nodes
+
+---
+### AUDITING, AUTOMATION, AND MONITORING PROCESS FOR DEVOPS
+To execute bulk migrations safely and efficiently, DevOps teams can follow this technical workflow:
+
+Step 1: Audit Existing gp2 Volumes: Use administrative tools like AWS Cost Optimization Hub, AWS Cost Explorer, or AWS CLI to identify volumes needing upgrades and estimate cost savings.
+
+Step 2: Automate the Migration Process (IaC & Automation): Instead of manually operating each volume on the AWS Management Console, use AWS Systems Manager (SSM) Automation or Lambda to call the ModifyVolume API for bulk upgrades. For Infrastructure as Code (Terraform / CloudFormation / AWS CDK), update the property volume_type = "gp3" in infrastructure management code to prevent IaC from overwriting old configurations during future deployments.
+
+Step 3: Monitor CloudWatch Metrics Post-Migration: After upgrading, track key metrics on Amazon CloudWatch for 7–14 days:
+
+VolumeReadOps and VolumeWriteOps: Calculate total actual IOPS consumed.
+
+VolumeThroughputPercentage: Check bandwidth consumption.
+
+VolumeConsumedReadWriteOps: Check if the system experiences throttling due to exceeding the default 3,000 IOPS threshold. If so, proactively configure higher IOPS for that volume.
+
+---
+### CONCLUSION
+Migrating from gp2 to gp3 is one of the highest cost-benefit ratio "Quick Wins" on AWS. Businesses instantly cut storage costs by 20% while gaining flexible, independent performance without accepting any system downtime. If your infrastructure still runs gp2 drives, now is the ideal time to automate this upgrade process.
+
+Reference Source: https://aws.amazon.com/blogs/storage/migrate-your-amazon-ebs-volumes-from-gp2-to-gp3-and-save-up-to-20-on-costs/
+
+#AWS #AmazonEBS #AWSStorage #CostOptimization #FinOps #AmazonEC2 #CloudComputing #DevOps
+
+-----
+
+**TAGS:** announcements, Artificial Intelligence, AWS Public Sector, education, skills, skills development, workforce development
+

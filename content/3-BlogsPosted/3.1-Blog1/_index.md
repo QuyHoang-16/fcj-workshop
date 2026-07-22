@@ -5,27 +5,40 @@ weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
+# AWS SECURITY & S3 – Amazon S3 to Disable SSE-C by Default in April 2026: What Developers and DevOps Need to Know
+---
 
-# SESSION POLICIES IN AMAZON EKS POD IDENTITY
+### CORE CHANGES AND REASONS FROM AWS
+While SSE-C gives businesses full control over encryption keys, it places 100% of the key management responsibility on the application side. If a key is lost or sent incorrectly, data cannot be decrypted.
 
-Amazon EKS Pod Identity has recently added the session policies feature, allowing you to narrow IAM permissions flexibly and precisely for each pod without needing to create many separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+According to AWS, starting in April 2026:
 
-Key points to know:
+Disabled on New Buckets: New General Purpose Buckets will not support SSE-C by default.
 
-* A session policy is an inline IAM policy specified when creating or updating a Pod Identity association.
-* Effective permissions = intersection between the IAM role permissions and the session policy → the session policy can only narrow permissions, not expand them.
-* Helps avoid over-permissioning when reusing a single IAM role for multiple workloads with different needs.
-* Supports both same-account and cross-account (via IAM role chaining).
-* Significantly reduces the number of IAM roles that need to be managed, helping avoid hitting IAM quota limits in large clusters.
-* Easily configured through the AWS Management Console, AWS CLI, or AWS SDK when creating an association between a Kubernetes ServiceAccount and an IAM role.
+Applied to Unused Accounts: For AWS Accounts that have never stored data encrypted using SSE-C, existing buckets will also have this feature disabled.
 
-This feature is especially useful when you have many applications running on the same IAM role but need different permission restrictions (for example: one pod only reads a specific S3 bucket, another pod only calls certain APIs).
+HTTP 403 Access Denied Error: If an application still sends a PutObject request with SSE-C headers (x-amz-server-side-encryption-customer-algorithm, x-amz-server-side-encryption-customer-key, x-amz-server-side-encryption-customer-key-MD5) without reconfiguring the bucket, Amazon S3 will block and return an error immediately.
 
-...Image...
+This change aims to reduce misconfiguration risks for new users while encouraging systems to migrate to more secure, centralized key management solutions like SSE-KMS.
 
-...Link...
+---
+### OPERATIONAL TECHNIQUES AND ACTION PLAN FOR DEVELOPERS / DEVOPS
+To avoid service disruption risks for systems such as backup pipelines, document uploads, file-sharing services, or data lakes using older SDKs, teams need to proactively take the following steps:
 
-...Guide...
+Manual Activation if SSE-C is Required: Administrators must proactively re-enable SSE-C via APIs or update Infrastructure as Code (IaC) scripts like AWS CloudFormation, Terraform, AWS CDK, or AWS CLI before deployment.
+
+System-Wide Audit: Review all S3 buckets and check application source code or SDKs to see if they are sending Customer-Provided Keys.
+
+Migration Roadmap to SSE-S3 or SSE-KMS:
+
+Use SSE-S3 for the simplest solution with no extra cost, enabled by default for most applications.
+
+Use SSE-KMS for Production environments requiring high security, IAM permission controls, CloudTrail access logging, automatic key rotation, and compliance standards like PCI DSS, HIPAA, and ISO 27001.
+
+---
+### CONCLUSION
+This change is vital for systems currently using SSE-C. Reviewing configurations, updating Infrastructure as Code, and considering a transition to SSE-KMS will keep systems stable and minimize service disruption risks when AWS officially enforces the new policy.
+
+Reference Source: https://aws.amazon.com/blogs/storage/advanced-notice-amazon-s3-to-disable-the-use-of-sse-c-encryption-by-default-for-all-new-buckets-and-select-existing-buckets-in-april-2026/
+
+#AWS #AmazonS3 #CloudSecurity #SSEKMS #SSEC #DevOps #CloudComputing #AWSStorage

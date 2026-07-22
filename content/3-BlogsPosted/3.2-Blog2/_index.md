@@ -5,27 +5,48 @@ weight: 1
 chapter: false
 pre: " <b> 3.2. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
+# AWS BACKUP – Item-Level Recovery for Amazon EBS and Amazon S3
 
-# SESSION POLICIES IN AMAZON EKS POD IDENTITY
+-----
 
-Amazon EKS Pod Identity has recently added the session policies feature, allowing you to narrow IAM permissions flexibly and precisely for each pod without needing to create many separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+### WHAT IS ITEM-LEVEL RECOVERY AND REAL-WORLD USE CASES
+Item-Level Recovery (ILR) allows you to restore individual files or objects instead of an entire backup, eliminating the need to restore a multi-terabyte EBS volume just to retrieve a single file.
 
-Key points to know:
+Key use cases include:
 
-* A session policy is an inline IAM policy specified when creating or updating a Pod Identity association.
-* Effective permissions = intersection between the IAM role permissions and the session policy → the session policy can only narrow permissions, not expand them.
-* Helps avoid over-permissioning when reusing a single IAM role for multiple workloads with different needs.
-* Supports both same-account and cross-account (via IAM role chaining).
-* Significantly reduces the number of IAM roles that need to be managed, helping avoid hitting IAM quota limits in large clusters.
-* Easily configured through the AWS Management Console, AWS CLI, or AWS SDK when creating an association between a Kubernetes ServiceAccount and an IAM role.
+Recovering Accidental Deletions: Quickly restore accidentally deleted configuration files or documents on EC2 volumes in minutes.
 
-This feature is especially useful when you have many applications running on the same IAM role but need different permission restrictions (for example: one pod only reads a specific S3 bucket, another pod only calls certain APIs).
+Audit and Incident Investigation: Easily retrieve old PDFs, Excel reports, video footage, or CSV files without mounting snapshots or restoring entire volumes.
 
-...Image...
+Shortening Recovery Time Objective (RTO): Reduce production system downtime from hours to minutes when data loss occurs.
 
-...Link...
+---
+### OPERATIONAL MECHANISM AND PREPARATION STEPS FOR DEVOPS / OPERATIONS
+AWS Backup uses Backup Indexing to index file metadata during the backup process, avoiding the need to scan entire snapshots.
 
-...Guide...
+Key steps and considerations:
+
+Enable Backup Indexing: A prerequisite when creating Backup Plans or running On-Demand Backups so AWS can index data.
+
+Use Tags Consistently: Apply consistent tags across EC2 instances, EBS volumes, and Backup Vaults to simplify management and searching.
+
+Use AWS Backup Search: Directly query files by name, path, format, timeframe, or metadata to perform Item-Level Restores.
+
+Optimize Operations: Combine proper Backup Plans, periodic restore testing, and AWS Backup Vault Lock to enhance ransomware protection.
+
+
+### CONCLUSION
+AWS Backup Search and Item-Level Recovery significantly reduce RTO and operational costs by allowing DevOps and Cloud Operations teams to find and restore precise files quickly instead of full snapshots.
+
+Reference Source: https://aws.amazon.com/blogs/storage/enable-item-level-search-and-recovery-for-amazon-ec2-with-aws-backup/
+
+#AWS #AWSBackup #AmazonEBS #AmazonS3 #DisasterRecovery #DataProtection #DevOps #CloudComputing
+
+This approach streamlines operations, ensures data privacy, and provides the flexibility to adapt to evolving business requirements. The result is a seamless, customized solution that optimizes costs and maintains regulatory compliance, all within a single, scalable platform.
+
+### Learn more
+
+  * New to Amazon Connect? You can navigate to our [Getting started with Amazon Connect User Guide](https://www.google.com/search?q=%23).
+  * Eager to hear more about the latest Amazon Connect capabilities? Watch on-demand webinars, how-to, and demos in our [Amazon Connect Enablement YouTube channel](https://www.google.com/search?q=%23).
+  * Curious to try our Amazon Connect hands-on Workshops? Navigate the [Amazon Connect Workshops](https://www.google.com/search?q=%23) we curated for you.
+  * Curious about upcoming Amazon Connect events? Check out the [Customer Experience Workshops & Events](https://www.google.com/search?q=%23) and register for an upcoming event.

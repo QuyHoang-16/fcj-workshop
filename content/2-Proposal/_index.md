@@ -5,111 +5,169 @@ weight: 2
 chapter: false
 pre: " <b> 2. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
+# SMART ATTENDANCE SAAS PLATFORM
+Local and Cloud-Ready Hybrid Solution for Smart Attendance and User Management
+### 1. Project Summary
+The Smart Attendance SaaS Platform is a comprehensive digital solution designed for tracking attendance, user registration, authentication, and report management. The project was researched and developed to streamline attendance tracking workflows, support role-based user management, and provide a user-friendly interface for modern organizations and academic or enterprise teams.
 
-In this section, you need to summarize the contents of the workshop that you **plan** to conduct.
+The system supports clean user workflows by separating pages and functionalities such as Login, Register, Checkout, and Dashboard/Attendance reports. The platform covers the core requirements of an attendance tracking system through interconnected components:
 
-# IoT Weather Platform for Lab Research
-## A Unified AWS Serverless Solution for Real-Time Weather Monitoring
+User Authentication & Registration: Manages user identity and account creation through dedicated registration and login interfaces.
 
-### 1. Executive Summary
-The IoT Weather Platform is designed for the ITea Lab team in Ho Chi Minh City to enhance weather data collection and analysis. It supports up to 5 weather stations, with potential scalability to 10-15, utilizing Raspberry Pi edge devices with ESP32 sensors to transmit data via MQTT. The platform leverages AWS Serverless services to deliver real-time monitoring, predictive analytics, and cost efficiency, with access restricted to 5 lab members via Amazon Cognito.
+Attendance Management: Allows users to perform check-in and checkout actions efficiently with real-time tracking capabilities.
+
+Reporting & Exporting: Collects operational attendance data and supports reporting features to export logs and metrics.
+
+The project utilizes a modern web-based architecture combining an HTML/CSS frontend with a Node.js and Express backend (server.js), structured cleanly with modular source files (src/handler/, src/shared/) to ensure maintainability and smooth local or cloud deployment.
 
 ### 2. Problem Statement
-### What’s the Problem?
-Current weather stations require manual data collection, becoming unmanageable with multiple units. There is no centralized system for real-time data or analytics, and third-party platforms are costly and overly complex.
+What is the problem?
+Currently, many small and medium-sized teams or organizations still rely on manual tracking or fragmented tools when managing member attendance, leading to several drawbacks:
 
-### The Solution
-The platform uses AWS IoT Core to ingest MQTT data, AWS Lambda and API Gateway for processing, Amazon S3 for storage (including a data lake), and AWS Glue Crawlers and ETL jobs to extract, transform, and load data from the S3 data lake to another S3 bucket for analysis. AWS Amplify with Next.js provides the web interface, and Amazon Cognito ensures secure access. Similar to Thingsboard and CoreIoT, users can register new devices and manage connections, though this platform operates on a smaller scale and is designed for private use. Key features include real-time dashboards, trend analysis, and low operational costs.
+Difficulty tracking real-time status: Traditional manual methods lack instant verification mechanisms, causing confusion and inaccurate attendance records.
 
-### Benefits and Return on Investment
-The solution establishes a foundational resource for lab members to develop a larger IoT platform, serving as a study resource, and provides a data foundation for AI enthusiasts for model training or analysis. It reduces manual reporting for each station via a centralized platform, simplifying management and maintenance, and improves data reliability. Monthly costs are $0.66 USD per the AWS Pricing Calculator, with a 12-month total of $7.92 USD. All IoT equipment costs are covered by the existing weather station setup, eliminating additional development expenses. The break-even period of 6-12 months is achieved through significant time savings from reduced manual work.
+Complex authentication overheads: Managing user credentials and secure access without a streamlined system leads to security vulnerabilities and cumbersome user experiences.
+
+Lack of unified reporting: Compiling attendance logs and generating reports manually consumes substantial administrative time and effort.
+
+Infrastructure rigidity: Heavy or poorly configured deployment setups make local testing, debugging, and continuous development complicated.
+
+### Solution
+The platform provides a unified application that automates and simplifies attendance tracking touchpoints:
+
+Streamlined Check-in/Check-out Workflows: Users can seamlessly interact via intuitive HTML interfaces (index.html, checkin.html, checkout.html) backed by robust server routes to record data instantly.
+
+Structured Backend Processing: Powered by an Express-based server (server.js) equipped with CORS support and modular handlers (src/handler/attendance/checkin.js, src/handler/reports/export.js) for reliable request handling and data management.
+
+Flexible Deployment and Configuration: Designed with clear separation between frontend views and backend services, allowing developers to easily switch and test between local development environments and cloud configurations.
+
+Benefits and Value Delivered
+Optimized Operational Workflow: Reduces administrative overhead by digitizing the entire attendance tracking and reporting pipeline.
+
+High Extensibility and Clean Architecture: The modular separation of handlers, shared database configurations, and UI components allows for easy scaling and feature expansion.
+
+Developer-Friendly Environment: Provides a clear project layout that supports seamless local execution, fast debugging, and straightforward integration with version control systems like Git.
+
+---
 
 ### 3. Solution Architecture
-The platform employs a serverless AWS architecture to manage data from 5 Raspberry Pi-based stations, scalable to 15. Data is ingested via AWS IoT Core, stored in an S3 data lake, and processed by AWS Glue Crawlers and ETL jobs to transform and load it into another S3 bucket for analysis. Lambda and API Gateway handle additional processing, while Amplify with Next.js hosts the dashboard, secured by Cognito. The architecture is detailed below:
+### MVP Architecture
+The MVP is designed with a fully serverless, highly scalable cloud architecture tailored for SaaS applications, leveraging AWS managed services as illustrated in the system topology.
 
-![IoT Weather Station Architecture](/images/2-Proposal/edge_architecture.jpeg)
+Core AWS Services & Infrastructure:
 
-![IoT Weather Platform Architecture](/images/2-Proposal/platform_architecture.jpeg)
+Global Edge Services: Amazon Route 53 (DNS Resolution), Amazon CloudFront (Global CDN), AWS Shield (DDoS Protection), AWS WAF v2, and Amazon S3 (React SPA Hosting).
 
-### AWS Services Used
-- **AWS IoT Core**: Ingests MQTT data from 5 stations, scalable to 15.
-- **AWS Lambda**: Processes data and triggers Glue jobs (two functions).
-- **Amazon API Gateway**: Facilitates web app communication.
-- **Amazon S3**: Stores raw data in a data lake and processed outputs (two buckets).
-- **AWS Glue**: Crawlers catalog data, and ETL jobs transform and load it.
-- **AWS Amplify**: Hosts the Next.js web interface.
-- **Amazon Cognito**: Secures access for lab users.
+Authentication & API Layer: Amazon Cognito (User Auth, JWT Token, Tenant/Role Management), AWS Secrets Manager, and Amazon API Gateway (HTTP API v2, JWT Authorizer, Caching, Throttling).
 
-### Component Design
-- **Edge Devices**: Raspberry Pi collects and filters sensor data, sending it to IoT Core.
-- **Data Ingestion**: AWS IoT Core receives MQTT messages from the edge devices.
-- **Data Storage**: Raw data is stored in an S3 data lake; processed data is stored in another S3 bucket.
-- **Data Processing**: AWS Glue Crawlers catalog the data, and ETL jobs transform it for analysis.
-- **Web Interface**: AWS Amplify hosts a Next.js app for real-time dashboards and analytics.
-- **User Management**: Amazon Cognito manages user access, allowing up to 5 active accounts.
+Compute Layer (AWS Lambda & Step Functions): Lambda functions for Webhook, Check-in, Check-out, Attendance, Report, Admin, and Subscription processing, coupled with Amazon SQS (Queue + DLQ) and AWS Step Functions Workflow.
+
+Data Layer: Amazon DynamoDB (Single-Table Design, Streams Enabled for Attendance, Users, Tenants), DynamoDB Streams, AWS KMS (Customer Keys for Data Encryption), and Amazon S3 (Report Storage for PDF, Excel, CSV).
+
+Event-Driven & Notification Layer: Amazon EventBridge (Event Bus), Amazon SNS (Email Queue + DLQ Buffer), Lambda Email Worker, and Amazon SES (Email Delivery for Reports, Alerts, Invoices).
+
+Operations Layer (Monitoring, Tracing & CI/CD): CloudWatch, AWS X-Ray, CloudFormation, CodePipeline, CodeBuild, and AWS Security Hub / GuardDuty.
+
+<img src="/images/2-Proposal/1.jpg"
+     alt="Architecture"
+     style="width:100%;max-width:500px;height:auto;object-fit:contain;display:block;margin:0 auto;border:none;">
+
+---
 
 ### 4. Technical Implementation
-**Implementation Phases**
-This project has two parts—setting up weather edge stations and building the weather platform—each following 4 phases:
-- Build Theory and Draw Architecture: Research Raspberry Pi setup with ESP32 sensors and design the AWS serverless architecture (1 month pre-internship)
-- Calculate Price and Check Practicality: Use AWS Pricing Calculator to estimate costs and adjust if needed (Month 1).
-- Fix Architecture for Cost or Solution Fit: Tweak the design (e.g., optimize Lambda with Next.js) to stay cost-effective and usable (Month 2).
-- Develop, Test, and Deploy: Code the Raspberry Pi setup, AWS services with CDK/SDK, and Next.js app, then test and release to production (Months 2-3).
+### Implementation Phases
+Phase 1 – MVP Deployment (Completed / Current)
 
-**Technical Requirements**
-- Weather Edge Station: Sensors (temperature, humidity, rainfall, wind speed), a microcontroller (ESP32), and a Raspberry Pi as the edge device. Raspberry Pi runs Raspbian, handles Docker for filtering, and sends 1 MB/day per station via MQTT over Wi-Fi.
-- Weather Platform: Practical knowledge of AWS Amplify (hosting Next.js), Lambda (minimal use due to Next.js), AWS Glue (ETL), S3 (two buckets), IoT Core (gateway and rules), and Cognito (5 users). Use AWS CDK/SDK to code interactions (e.g., IoT Core rules to S3). Next.js reduces Lambda workload for the fullstack web app.
+Implement Global Edge Services (Route53, CloudFront, WAF, S3 SPA Hosting).
+
+Configure Authentication & API Layer via Amazon Cognito and API Gateway.
+
+Deploy Compute Layer using AWS Lambda functions and Step Functions workflow.
+
+Establish Data Layer with Amazon DynamoDB Single-Table Design, S3 Report Storage, and KMS encryption.
+
+Enable Event-Driven notifications via EventBridge, SNS, and SES.
+
+Log and monitor via CloudWatch, X-Ray, and Security Hub.
+
+Phase 2 – Future Design Expansion
+
+Optimize asynchronous processing pipelines via SQS and SNS queues.
+
+Enhance automated CI/CD deployment routines using CodePipeline and CodeBuild.
+
+Scale automated security policies and threat detection via GuardDuty.
+
+---
 
 ### 5. Timeline & Milestones
-**Project Timeline**
-- Pre-Internship (Month 0): 1 month for planning and old station review.
-- Internship (Months 1-3): 3 months.
-    - Month 1: Study AWS and upgrade hardware.
-    - Month 2: Design and adjust architecture.
-    - Month 3: Implement, test, and launch.
-- Post-Launch: Up to 1 year for research.
 
-### 6. Budget Estimation
-You can find the budget estimation on the [AWS Pricing Calculator](https://calculator.aws/#/estimate?id=621f38b12a1ef026842ba2ddfe46ff936ed4ab01).  
-Or you can download the [Budget Estimation File](../attachments/budget_estimation.pdf).
+| Phase | Description |
+|-------|-------------|
+| **Week 7: Project Initiation & Feasibility** | Comprehensive SaaS requirements specification, feasibility study on multi-tenant isolation, and definition of functional metrics for smart attendance workflow. |
+| **Week 8: Core Architecture & Flow Modeling** | High-availability serverless topology mapping, detailed sequence diagrams for check-in/check-out tracking, and secure tenant authentication flowcharts. |
+| **Week 9: Infrastructure Provisioning** | Infrastructure-as-Code scripts (template.yaml) provisioning DynamoDB single-tables, KMS encryption keys, and S3 secure storage buckets. |
+| **Week 10: Security & Gateway Implementation** | Configured Amazon Cognito user pools with JWT tokens, hardened API Gateway endpoints, and deployed AWS WAF v2 rules for rate-limiting and bot defense. |
+| **Week 11: Backend & Business Logic Engineering** | Functional Lambda microservices for attendance processing, automated SQS/SNS messaging buffers, Step Functions report workflows, and SES notification templates. |
+| **Week 12: Integration, Testing & Launch** | Performance stress tests across CloudFront edge locations, integrated CI/CD pipeline verification via CodePipeline, and complete operational handover documentation. |
 
-### Infrastructure Costs
-- AWS Services:
-    - AWS Lambda: $0.00/month (1,000 requests, 512 MB storage).
-    - S3 Standard: $0.15/month (6 GB, 2,100 requests, 1 GB scanned).
-    - Data Transfer: $0.02/month (1 GB inbound, 1 GB outbound).
-    - AWS Amplify: $0.35/month (256 MB, 500 ms requests).
-    - Amazon API Gateway: $0.01/month (2,000 requests).
-    - AWS Glue ETL Jobs: $0.02/month (2 DPUs).
-    - AWS Glue Crawlers: $0.07/month (1 crawler).
-    - MQTT (IoT Core): $0.08/month (5 devices, 45,000 messages).
+---
 
-Total: $0.7/month, $8.40/12 months
+### 6. Cost Estimate (AWS Pricing Estimate)
 
-- Hardware: $265 one-time (Raspberry Pi 5 and sensors).
+#### Total Cost
+- **Monthly:** $13.50  
+- **Upfront:** $0.00  
+- **12 Months:** $162.00
+
+---
+
+#### Service Overview
+
+| Service | Region | Monthly Cost | Upfront | 12-Month Cost | Notes |
+|--------|---------|--------------|---------|---------------|-------|
+| Amazon Route 53 | Asia Pacific (Singapore) | $0.50 | $0.00 | $6.00 | 1 Hosted Zone & domain resolution setup |
+| Amazon CloudFront |	Asia Pacific (Singapore) |	$0.00 |	$0.00 |	$0.00 |	Global CDN distribution for React SPA |
+| AWS WAF v2 |	Asia Pacific (Singapore) |	$6.00 |	$0.00 |	$72.00 |	1 Web ACL; rate limiting, bot control, and geo rules |
+|Amazon S3 |	Asia Pacific (Singapore) |	$0.35 |	$0.00 |	$4.20 |	SPA hosting and intelligent-tiering report storage |
+|Amazon Cognito |	Asia Pacific (Singapore) |	$0.00 |	$0.00 |	$0.00 |	User pool authentication (Within monthly free tier) |
+|AWS Secrets Manager |	Asia Pacific (Singapore) |	$0.40 |	$0.00 |	$4.80 |	1 active secret with automatic credential rotation |
+|Amazon API Gateway |	Asia Pacific (Singapore) |	$0.20 |	$0.00 |	$2.40 |	HTTP API v2 with JWT authorizer, caching, and throttling |
+|AWS Lambda |	Asia Pacific (Singapore) |	$1.85 |	$0.00 |	$22.20 |	Compute layer for check-in/out, webhooks, and reporting |
+|AWS Step Functions |	Asia Pacific (Singapore) |	$0.10 |	$0.00 |	$1.20 |	Workflows for asynchronous report orchestration |
+|Amazon SQS |	Asia Pacific (Singapore) |	$0.00 |	$0.00 |	$0.00 |	Standard queues + DLQ buffers |
+|Amazon DynamoDB On-Demand |	Asia Pacific (Singapore) |	$0.60 |	$0.00 |	$7.20 |	Single-table design, streams enabled, on-demand mode |
+|AWS KMS |	Asia Pacific (Singapore) |	$1.00 |	$0.00 |	$12.00 |	1 Customer Managed Key (CMK) for data encryption |
+|Amazon EventBridge |	Asia Pacific (Singapore) |	$0.00 |	$0.00 |	$0.00 |	Custom event bus routing |
+|Amazon SNS |	Asia Pacific (Singapore) |	$0.00 |	$0.00 |	$0.00 |	Notification routing and email queue buffer |
+|Amazon SES |	Asia Pacific (Singapore) |	$0.10 |	$0.00 |	$1.20 |	Outbound transactional emails (Reports, alerts, invoices) |
+|CloudWatch, X-Ray & Security Hub |	Asia Pacific (Singapore) |	$2.40 |	$0.00 |	$28.80 |	Logs, metrics, distributed tracing, and security posture checks |
+|Total (Estimate) |	— |	$13.50 |	$0.00 |	$162.00 |	Based on AWS Pricing Calculator |
+
+---
 
 ### 7. Risk Assessment
-#### Risk Matrix
-- Network Outages: Medium impact, medium probability.
-- Sensor Failures: High impact, low probability.
-- Cost Overruns: Medium impact, low probability.
+| Risk | Impact | Probability | Mitigation |
+|------|---------|-------------|-------------|
+| API request throttling or latency | Medium | High | Use API Gateway caching and Lambda optimization |
+| Cost increase from database traffic spikes | High | Medium | Utilize DynamoDB on-demand scaling with fine-grained partition keys |
+| Pipeline deployment failures | Medium | Low | Use CloudFormation rollback policies and CodePipeline stages |
+| Security vulnerabilities | High | Medium | Enforce WAF rules, IAM least privilege, KMS encryption, and Security Hub alerts |
+| Third-party API dependency | Medium | Medium | Implement robust error handling with SQS DLQ buffers |
 
-#### Mitigation Strategies
-- Network: Local storage on Raspberry Pi with Docker.
-- Sensors: Regular checks and spares.
-- Cost: AWS budget alerts and optimization.
-
-#### Contingency Plans
-- Revert to manual methods if AWS fails.
-- Use CloudFormation for cost-related rollbacks.
+---
 
 ### 8. Expected Outcomes
-#### Technical Improvements: 
-Real-time data and analytics replace manual processes.  
-Scalable to 10-15 stations.
-#### Long-term Value
-1-year data foundation for AI research.  
-Reusable for future projects.
+### Technical Outcomes:
+Complete serverless attendance tracking workflow backed by AWS managed services.
+
+Highly scalable event-driven architecture with secure CI/CD and monitoring pipelines.
+
+Improved reliability via isolated data layers and asynchronous SQS/Step Functions workflows.
+
+### Long-Term Value:
+A production-ready foundation for Enterprise SaaS Attendance & Management expansion.
+
+Fully automated cloud infrastructure utilizing Infrastructure as Code (CloudFormation).
+
+---
