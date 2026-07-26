@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Báo cáo thực tập</title><link>https://quyhoang-16.github.io/fcj-workshop/vi/</link><description>Recent content on Báo cáo thực tập</description><generator>Hugo</generator><language>vi</language><lastBuildDate>Mon, 01 Jan 0001 00:00:00 +0000</lastBuildDate><atom:link href="https://quyhoang-16.github.io/fcj-workshop/vi/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>https://quyhoang-16.github.io/fcj-workshop/vi/5-workshop/5.7-testing-cleanup/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://quyhoang-16.github.io/fcj-workshop/vi/5-workshop/5.7-testing-cleanup/</guid><description>&lt;h2 id="pre--b-57-b-">title: &amp;ldquo;Testing &amp;amp; Resource Cleanup&amp;rdquo;
+date: 2024-01-01
+weight: 7
+chapter: false
+pre: &amp;quot; &lt;b> 5.7 &lt;/b> &amp;quot;&lt;/h2>
+&lt;h1 id="end-to-end-testing--resource-cleanup">End-to-End Testing &amp;amp; Resource Cleanup&lt;/h1>
+&lt;p>Congratulations on building and deploying the complete &lt;strong>Smart Attendance SaaS Platform&lt;/strong>! In this final module, you will perform end-to-end operational testing across 5 realistic scenarios and properly teardown deployed cloud resources to prevent ongoing AWS billing.&lt;/p>
+&lt;hr>
+&lt;h3 id="1-end-to-end-testing-scenarios">1. End-to-End Testing Scenarios&lt;/h3>
+&lt;p>Follow these 5 test scenarios on your live application:&lt;/p>
+&lt;h4 id="scenario-1-tenant-registration--authentication-multi-tenant-auth">Scenario 1: Tenant Registration &amp;amp; Authentication (Multi-Tenant Auth)&lt;/h4>
+&lt;ol>
+&lt;li>Navigate to your CloudFront distribution URL.&lt;/li>
+&lt;li>Select &lt;strong>Register Tenant&lt;/strong>. Enter Company A credentials (&lt;code>tenantId&lt;/code>: &lt;code>tenant-company-a&lt;/code>), Admin Email, and Password.&lt;/li>
+&lt;li>Complete email OTP verification.&lt;/li>
+&lt;li>Sign in as Admin. Verify the dashboard loads scoped under &lt;code>tenant-company-a&lt;/code>.&lt;/li>
+&lt;/ol>
+&lt;h4 id="scenario-2-employee-clock-in--clock-out">Scenario 2: Employee Clock-In &amp;amp; Clock-Out&lt;/h4>
+&lt;ol>
+&lt;li>Create an Employee user (&lt;code>user-employee-1&lt;/code>) associated with &lt;code>tenant-company-a&lt;/code>.&lt;/li>
+&lt;li>Sign in as the employee on a mobile device or browser simulator.&lt;/li>
+&lt;li>Click &lt;strong>Clock-In&lt;/strong> -&amp;gt; The app sends a JWT-authenticated request to API Gateway -&amp;gt; The &lt;code>CheckInFunction&lt;/code> Lambda commits the entry in sub-200ms.&lt;/li>
+&lt;li>Click &lt;strong>Clock-Out&lt;/strong> -&amp;gt; The system updates the clock-out timestamp in DynamoDB.&lt;/li>
+&lt;/ol>
+&lt;h4 id="scenario-3-query-attendance-history-dynamodb-single-table-query">Scenario 3: Query Attendance History (DynamoDB Single-Table Query)&lt;/h4>
+&lt;ol>
+&lt;li>Open &lt;strong>Attendance History&lt;/strong>.&lt;/li>
+&lt;li>The frontend queries DynamoDB using &lt;code>TENANT#tenant-company-a&lt;/code> partition key, returning real-time attendance logs in sub-50ms.&lt;/li>
+&lt;/ol>
+&lt;h4 id="scenario-4-export-monthly-attendance-reports-step-functions--ses">Scenario 4: Export Monthly Attendance Reports (Step Functions &amp;amp; SES)&lt;/h4>
+&lt;ol>
+&lt;li>From the Admin Dashboard, click &lt;strong>Export Monthly Report&lt;/strong>.&lt;/li>
+&lt;li>The UI displays an asynchronous confirmation status immediately (&amp;ldquo;Request Processing&amp;rdquo;).&lt;/li>
+&lt;li>Inspect the AWS Step Functions Console to monitor the Express State Machine executing the report file generation.&lt;/li>
+&lt;li>Check your inbox for the automated email delivered via &lt;strong>Amazon SES&lt;/strong> containing the secure download link from Amazon S3.&lt;/li>
+&lt;/ol>
+&lt;h4 id="scenario-5-b2b-subscription-payment-webhook">Scenario 5: B2B Subscription Payment Webhook&lt;/h4>
+&lt;ol>
+&lt;li>As Admin, select the Pro Tier plan and proceed to Checkout.&lt;/li>
+&lt;li>Simulate a payment gateway webhook callback to &lt;code>/billing/webhook&lt;/code>.&lt;/li>
+&lt;li>The &lt;code>WebhookFunction&lt;/code> validates the signature via &lt;strong>AWS Secrets Manager&lt;/strong> and updates tenant status to &lt;code>ACTIVE&lt;/code> in DynamoDB.&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h3 id="2-aws-resource-cleanup--teardown">2. AWS Resource Cleanup &amp;amp; Teardown&lt;/h3>
+&lt;p>To avoid unnecessary cloud costs after finishing the workshop, tear down all deployed resources following these steps:&lt;/p></description></item></channel></rss>
