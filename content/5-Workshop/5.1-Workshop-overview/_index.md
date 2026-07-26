@@ -32,3 +32,7 @@ After completing this workshop, you will gain hands-on expertise in:
 
 * **Estimated Time:** 60 - 90 minutes.
 * **Level:** Intermediate to Advanced.
+
+
+### Source Code
+Link: https://github.com/nganh25/smart-attendance-saas/
