@@ -17,7 +17,7 @@ chapter: false
 
 &emsp; **Email:** hoanganhquy1606@gmail.com
 
-&emsp; **University:** Ho Chi Minh City University of Technology (HUTECH)
+&emsp; **University:** Ho Chi Minh City University of Technology 
 
 &emsp; **Major:** Information Technology
 
@@ -25,7 +25,7 @@ chapter: false
 
 &emsp; **Internship Company:** Amazon Web Services Viet Nam Company Limited
 
-&emsp; **Internship Position:** FCJ Cloud Intern
+&emsp; **Internship Position:** FCAJ Cloud Intern
 
 &emsp; **Internship Duration:** From 20/04/2026 to 19/07/2026
 
